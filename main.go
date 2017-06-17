@@ -39,6 +39,8 @@ func main() {
 		// join them to chat room
 		c.Join("chatRoom")
 
+		c.Join("livenessRoom")
+
 		//for a, b := range c.RequestHeader() {
 		//	log.Println("key: " + a)
 		//	for c, d := range b {
@@ -56,6 +58,7 @@ func main() {
 		// but you can remove client from room whenever you need to
 		c.Leave("socialAuthRoom")
 		c.Leave("chatRoom")
+		c.Leave("livenessRoom")
 
 		log.Println("Disconnected")
 	})
@@ -108,6 +111,14 @@ func main() {
 		log.Println(fmt.Sprintf("chatUserLogout: %d", userId))
 		c.BroadcastTo("chatRoom", "chatUserLogout", userId)
 
+		return "OK"
+	})
+
+	// handle custom event
+	server.On("liveness", func(c *gosocketio.Channel, msg int) string {
+		// send event to all in room
+		c.BroadcastTo("livenessRoom", "livenessMessage", msg + 1)
+		log.Println(fmt.Sprintf("livenessRoom livenessMessage: %d", msg))
 		return "OK"
 	})
 
